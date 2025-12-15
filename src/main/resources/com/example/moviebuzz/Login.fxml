@@ -1,23 +1,37 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?import javafx.geometry.Insets?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 
-<VBox alignment="CENTER" spacing="20.0" style="-fx-background-color: #2c3e50; -fx-padding: 40;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.moviebuzz.LoginController">
-    <Label text="MovieBuzz Admin" textFill="WHITE">
-        <font><Font name="System Bold" size="28.0" /></font>
-    </Label>
+<AnchorPane prefHeight="600.0" prefWidth="900.0" style="-fx-background-color: #f4f4f4;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.moviebuzz.LoginController">
+    <children>
+        <Button fx:id="adminToggleButton" layoutX="780.0" layoutY="20.0" onAction="#handleAdminToggle"
+                style="-fx-background-color: transparent; -fx-text-fill: #2980b9; -fx-border-color: #2980b9; -fx-border-radius: 5; -fx-cursor: hand;"
+                text="Admin Portal" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0" />
 
-    <VBox spacing="10.0" maxWidth="300">
-        <Label text="Username" textFill="#bdc3c7" />
-        <TextField fx:id="usernameField" promptText="Admin ID" style="-fx-background-color: #34495e; -fx-text-fill: white;" />
+        <VBox alignment="CENTER" spacing="20.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" pickOnBounds="false">
+            <children>
+                <Label fx:id="loginHeader" text="User Login">
+                    <font>
+                        <Font name="System Bold" size="32.0" />
+                    </font>
+                </Label>
 
-        <Label text="Password" textFill="#bdc3c7" />
-        <PasswordField fx:id="passwordField" promptText="Password" style="-fx-background-color: #34495e; -fx-text-fill: white;" />
-    </VBox>
+                <VBox alignment="CENTER" maxWidth="300.0" spacing="10.0">
+                    <children>
+                        <TextField fx:id="usernameField" prefHeight="40.0" prefWidth="300.0" promptText="Username" />
+                        <PasswordField fx:id="passwordField" prefHeight="40.0" prefWidth="300.0" promptText="Password" />
+                    </children>
+                </VBox>
 
-    <Label fx:id="errorMessageLabel" textFill="#e74c3c" visible="false" />
+                <Label fx:id="errorMessageLabel" textFill="RED" visible="false" wrapText="true" />
 
-    <Button onAction="#handleLogin" prefWidth="200.0" style="-fx-background-color: #1abc9c; -fx-text-fill: white; -fx-font-weight: bold;" text="Access Dashboard" />
-</VBox>
+                <Button onAction="#handleLogin" prefHeight="40.0" prefWidth="300.0" style="-fx-cursor: hand;" text="Sign In" />
+
+                <Hyperlink fx:id="createAccountLink" onAction="#goToSignUp" text="Create New Account" />
+
+                <Hyperlink fx:id="backButton" onAction="#handleAdminToggle" text="← Back to User Login" visible="false" />
+            </children>
+        </VBox>
+    </children>
+</AnchorPane>

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<StackPane prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.moviebuzz.SignUpController">
+    <children>
+        <VBox alignment="CENTER" fillWidth="false" spacing="20.0">
+            <children>
+                <Label text="Registration">
+                    <font>
+                        <Font name="System Bold" size="28.0" />
+                    </font>
+                </Label>
+
+                <VBox spacing="10.0">
+                    <children>
+                        <TextField fx:id="newEmail" prefHeight="40.0" prefWidth="300.0" promptText="Email Address" />
+                        <TextField fx:id="newUsername" prefHeight="40.0" prefWidth="300.0" promptText="Username" />
+                        <PasswordField fx:id="newPassword" prefHeight="40.0" prefWidth="300.0" promptText="Password" />
+                    </children>
+                </VBox>
+
+                <Button onAction="#handleSignUp" prefHeight="40.0" prefWidth="300.0" text="Register" />
+                <Hyperlink onAction="#backToLogin" text="Already have an account? Login" />
+            </children>
+        </VBox>
+    </children>
+</StackPane>

@@ -10,14 +10,15 @@ public class HelloApplication extends Application {
     @Override
     public void start(Stage stage) throws IOException {
 
-        FirebaseInitializer.initialize();
+        DatabaseHandler.initializeDatabase();
+
         FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("Login.fxml"));
         Scene scene = new Scene(fxmlLoader.load(), 900, 600);
-        stage.setTitle("MovieBuzz Admin Portal");
+        stage.setTitle("MovieBuzz - Ticketing");
         stage.setScene(scene);
-        stage.setResizable(true);
         stage.show();
     }
+
     public static void main(String[] args) {
         launch();
     }
