@@ -10,11 +10,9 @@ public class LoginController {
     @FXML private TextField usernameField;
     @FXML private PasswordField passwordField;
     @FXML private Label errorMessageLabel, loginHeader;
-    @FXML private Hyperlink backButton, createAccountLink;
-    @FXML private Button adminToggleButton;
+    @FXML private Button adminToggleButton, newAccountButton, backToUserButton;
 
     private boolean isAdminMode = false;
-
     private final SceneSwitcher sceneSwitcher = new SceneSwitcher();
 
     @FXML
@@ -22,16 +20,14 @@ public class LoginController {
         isAdminMode = !isAdminMode;
         loginHeader.setText(isAdminMode ? "Admin Portal" : "User Login");
 
-
         adminToggleButton.setVisible(!isAdminMode);
-        backButton.setVisible(isAdminMode);
-        createAccountLink.setVisible(!isAdminMode);
+        newAccountButton.setVisible(!isAdminMode);
+        backToUserButton.setVisible(isAdminMode);
 
         usernameField.clear();
         passwordField.clear();
         errorMessageLabel.setVisible(false);
     }
-
     @FXML
     public void handleLogin(ActionEvent event) {
         String user = usernameField.getText();
@@ -41,7 +37,6 @@ public class LoginController {
             showError("Please fill in all fields.");
             return;
         }
-
         try (Connection conn = DatabaseHandler.connect()) {
             String sql = "SELECT role FROM users WHERE username = ? AND password = ?";
             PreparedStatement pstmt = conn.prepareStatement(sql);
@@ -51,8 +46,6 @@ public class LoginController {
 
             if (rs.next()) {
                 String role = rs.getString("role");
-
-
                 if (isAdminMode && "admin".equalsIgnoreCase(role)) {
                     sceneSwitcher.switchScene(event, "admin-dashboard.fxml");
                 } else if (!isAdminMode && "customer".equalsIgnoreCase(role)) {
@@ -60,12 +53,8 @@ public class LoginController {
                 } else {
                     showError("Access denied for this portal.");
                 }
-            } else {
-                showError("Invalid credentials.");
-            }
-        } catch (SQLException | IOException e) {
-            showError("Database Error: " + e.getMessage());
-        }
+            } else { showError("Invalid credentials."); }
+        } catch (SQLException | IOException e) { showError("Error: " + e.getMessage()); }
     }
 
     @FXML

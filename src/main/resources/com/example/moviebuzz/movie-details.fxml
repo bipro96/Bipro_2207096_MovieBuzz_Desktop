@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox alignment="TOP_CENTER" spacing="20.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.moviebuzz.MovieDetailsController">
+    <children>
+        <HBox spacing="30.0">
+            <children>
+                <ImageView fx:id="detailPoster" fitHeight="400.0" fitWidth="280.0" pickOnBounds="true" preserveRatio="true" />
+
+                <VBox spacing="15.0" HBox.hgrow="ALWAYS">
+                    <children>
+
+                        <Label fx:id="titleMovie" text="Title" textFill="#557183">
+
+                            <font><Font name="System Bold" size="24.0" /></font>
+                        </Label>
+
+                        <Label fx:id="detailGenre" text="Genre" textFill="#54585b">
+                            <font><Font size="18.0" /></font>
+                        </Label>
+                        <Label fx:id="detailDuration" text="Duration" textFill="#595c5e">
+                            <font><Font size="18.0" /></font>
+                        </Label>
+
+                        <HBox spacing="15.0" style="-fx-padding: 20 0 0 0;">
+                            <children>
+                                <Button onAction="#handleBookTicket" prefHeight="40.0" prefWidth="200.0" text="Book Ticket" />
+                                <Button onAction="#handleBack" prefHeight="40.0" prefWidth="100.0" text="Back" />
+                            </children>
+                        </HBox>
+                    </children>
+                </VBox>
+            </children>
+        </HBox>
+    </children>
+</VBox>

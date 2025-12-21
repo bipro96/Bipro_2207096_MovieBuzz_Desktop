@@ -13,10 +13,9 @@ public class DatabaseHandler {
         try (Connection conn = connect(); Statement stmt = conn.createStatement()) {
 
             stmt.execute("CREATE TABLE IF NOT EXISTS users (" +
-                    "username TEXT PRIMARY KEY, " +
-                    "password TEXT, " +
+                    "username TEXT PRIMARY KEY, "+
+                    "password TEXT, "+
                     "role TEXT)");
-
 
             stmt.execute("CREATE TABLE IF NOT EXISTS movies (" +
                     "id INTEGER PRIMARY KEY AUTOINCREMENT, " +
@@ -25,12 +24,10 @@ public class DatabaseHandler {
                     "duration TEXT, " +
                     "posterPath TEXT)");
 
-            stmt.execute("INSERT OR IGNORE INTO users (username, password, role) VALUES ('bb', 'bb96', 'admin')");
+            stmt.execute("INSERT OR IGNORE INTO users (username, password, role) " + "VALUES ('bb', 'bb96', 'admin')" );
 
-            System.out.println("Database and tables initialized successfully.");
-        } catch (SQLException e) {
-            System.err.println("Database Initialization Error: " + e.getMessage());
-            e.printStackTrace();
-        }
+            System.out.println("Database initialized.");
+        } catch (SQLException e) {e.printStackTrace();}
     }
+
 }

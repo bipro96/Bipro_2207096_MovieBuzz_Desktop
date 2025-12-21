@@ -15,14 +15,16 @@
 
                 <VBox spacing="10.0">
                     <children>
-                        <TextField fx:id="newEmail" prefHeight="40.0" prefWidth="300.0" promptText="Email Address" />
                         <TextField fx:id="newUsername" prefHeight="40.0" prefWidth="300.0" promptText="Username" />
                         <PasswordField fx:id="newPassword" prefHeight="40.0" prefWidth="300.0" promptText="Password" />
                     </children>
                 </VBox>
 
-                <Button onAction="#handleSignUp" prefHeight="40.0" prefWidth="300.0" text="Register" />
-                <Hyperlink onAction="#backToLogin" text="Already have an account? Login" />
+                <Label fx:id="errorMessageLabel" textFill="RED" visible="false" wrapText="true" />
+
+                <Button onAction="#handleSignUp" prefHeight="40.0" prefWidth="300.0" text="Register" style="-fx-cursor: hand;" />
+
+                <Button onAction="#backToLogin" prefWidth="100.0" text="Back" style="-fx-cursor: hand;" />
             </children>
         </VBox>
     </children>
