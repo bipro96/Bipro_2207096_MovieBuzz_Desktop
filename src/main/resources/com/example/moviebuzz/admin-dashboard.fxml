@@ -1,13 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.TableColumn?>
-<?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.TitledPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
 <?import javafx.scene.text.Font?>
 
 <VBox alignment="TOP_CENTER" prefHeight="600.0" prefWidth="900.0" spacing="15.0" style="-fx-padding: 20; -fx-background-color: #f4f4f4;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.moviebuzz.AdminController">
@@ -20,7 +14,7 @@
             <content>
                 <HBox alignment="CENTER" spacing="15.0">
                     <children>
-                        <TextField fx:id="apiSearchField" prefWidth="400.0" promptText="Enter Movie Name (e.g., Titanic)" />
+                        <TextField fx:id="apiSearchField" prefWidth="400.0" promptText="Enter Movie Name (e.g., Interstellar)" />
                         <Button onAction="#handleApiSearch" text="Search &amp; Add" />
                     </children>
                 </HBox>
@@ -31,9 +25,9 @@
 
         <TableView fx:id="movieTable" VBox.vgrow="ALWAYS">
             <columns>
-                <TableColumn fx:id="colTitle" prefWidth="270.0" text="Movie Title" />
-                <TableColumn fx:id="colGenre" prefWidth="225.0" text="Genre" />
-                <TableColumn fx:id="colDuration" prefWidth="135.0" text="Duration" />
+                <TableColumn fx:id="colTitle" prefWidth="270.0" text="Movie Title"  />
+                <TableColumn fx:id="colGenre" prefWidth="225.0" text="Genre"  />
+                <TableColumn fx:id="colDuration" prefWidth="135.0" text="Duration"  />
                 <TableColumn fx:id="colPoster" prefWidth="270.0" text="Poster URL" />
             </columns>
             <columnResizePolicy>
@@ -41,9 +35,11 @@
             </columnResizePolicy>
         </TableView>
 
-        <HBox alignment="CENTER" spacing="20.0">
+        <HBox alignment="CENTER" spacing="15.0">
             <children>
-                <Button onAction="#handleDeleteMovie" text="Delete Selected Movie" />
+                <Button onAction="#handleScheduleShow" text="Schedule Movie" />
+                <Button onAction="#handleViewShows" text="View All Shows" />
+                <Button onAction="#handleDeleteMovie" text="Delete Movie" />
                 <Button onAction="#handleLogout" prefWidth="100.0" text="Logout" />
             </children>
         </HBox>

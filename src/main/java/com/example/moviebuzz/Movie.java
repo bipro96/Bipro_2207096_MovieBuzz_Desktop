@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Movie {
-
     @JsonProperty("Title")
     private String title;
     @JsonProperty("Genre")

@@ -10,18 +10,19 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.moviebuzz.CustomerController">
+<AnchorPane prefHeight="600.0" prefWidth="900.0" style="-fx-background-color: #121212;" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.moviebuzz.CustomerController">
     <children>
         <VBox layoutX="20.0" layoutY="20.0" spacing="20.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0">
             <children>
-                <HBox alignment="CENTER_LEFT" spacing="20.0">
+                <HBox alignment="CENTER_LEFT" spacing="15.0">
                     <children>
-                        <Label text="Now Playing" textFill="#5e5959">
-                            <font>
-                                <Font name="System Bold" size="30.0" />
-                            </font>
+                        <Label text="Now Playing" textFill="WHITE">
+                            <font><Font name="System Bold" size="28.0" /></font>
                         </Label>
                         <Region HBox.hgrow="ALWAYS" />
+
+                        <Button onAction="#handleRecharge" text="+ Recharge Balance" />
+
                         <Button onAction="#handleLogout" text="Logout" />
                     </children>
                 </HBox>

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.DatePicker?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<VBox alignment="CENTER" prefHeight="450.0" prefWidth="600.0" spacing="20.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.moviebuzz.ScheduleMovieController">
+    <children>
+        <Label text="Movie Scheduling Form">
+            <font>
+                <Font name="System Bold" size="22.0" />
+            </font>
+        </Label>
+
+        <GridPane alignment="CENTER" hgap="10.0" style="-fx-background-color: #eeeeee; -fx-padding: 30; -fx-background-radius: 10;" vgap="15.0">
+            <columnConstraints>
+                <ColumnConstraints halignment="RIGHT" minWidth="100.0" />
+                <ColumnConstraints hgrow="ALWAYS" maxWidth="300.0" />
+            </columnConstraints>
+            <children>
+                <Label text="Movie Title:" />
+                <TextField fx:id="titleField" editable="false" GridPane.columnIndex="1" />
+
+                <Label text="Show Date:" GridPane.rowIndex="1" />
+                <DatePicker fx:id="datePicker" prefWidth="300.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+
+                <Label text="Show Time:" GridPane.rowIndex="2" />
+                <TextField fx:id="timeField" promptText="ex: 10:00 AM" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+                <Label text="Ticket Price (BDT):" GridPane.rowIndex="3" />
+                <TextField fx:id="priceField" promptText="ex: 200" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            </children>
+         <rowConstraints>
+            <RowConstraints />
+            <RowConstraints />
+            <RowConstraints />
+            <RowConstraints />
+         </rowConstraints>
+        </GridPane>
+
+        <HBox alignment="CENTER" spacing="20.0">
+            <children>
+                <Button onAction="#handleSaveShow" prefWidth="120.0" text="Save Schedule" />
+                <Button onAction="#handleCancel" prefWidth="100.0" text="Back" />
+            </children>
+        </HBox>
+    </children>
+</VBox>

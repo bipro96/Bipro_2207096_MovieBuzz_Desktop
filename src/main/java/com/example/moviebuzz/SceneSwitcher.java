@@ -11,11 +11,12 @@ import java.net.URL;
 public class SceneSwitcher {
     public void switchScene(ActionEvent event, String fxmlFile) throws IOException {
 
-        URL fxml = getClass().getResource(fxmlFile);
-        if (fxml == null) {
-            throw new IOException("Cannot find FXML file: " + fxmlFile); }
+        URL fxmlLocation = getClass().getResource(fxmlFile);
+        if (fxmlLocation == null) {
+            throw new IOException("Cannot find FXML file: " + fxmlFile);
+        }
 
-        FXMLLoader loader = new FXMLLoader(fxml);
+        FXMLLoader loader = new FXMLLoader(fxmlLocation);
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
         stage.setScene(new Scene(loader.load(), 900, 600));
     }

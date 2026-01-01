@@ -6,14 +6,16 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-
+import javafx.stage.Stage;
 import java.io.IOException;
 import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
+import java.net.http.*;
 import java.sql.*;
 
 public class AdminController {
@@ -31,7 +33,6 @@ public class AdminController {
         colGenre.setCellValueFactory(new PropertyValueFactory<>("genre"));
         colDuration.setCellValueFactory(new PropertyValueFactory<>("duration"));
         colPoster.setCellValueFactory(new PropertyValueFactory<>("posterPath"));
-
         loadMoviesFromDatabase();
     }
 
@@ -42,79 +43,89 @@ public class AdminController {
         statusLabel.setText("Searching OMDb...");
         String url = "http://www.omdbapi.com/?t=" + query + "&apikey=" + API_KEY;
 
-        HttpClient client = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest.newBuilder().uri(URI.create(url)).build();
-
-        client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+        HttpClient.newHttpClient().sendAsync(HttpRequest.newBuilder().uri(URI.create(url)).build(), HttpResponse.BodyHandlers.ofString())
                 .thenApply(HttpResponse::body)
-                .thenAccept(this::parseAndSaveMovie)
-                .exceptionally(ex -> {
-                    Platform.runLater(() -> statusLabel.setText("Network Error: " + ex.getMessage()));
-                    return null;
-                });
+                .thenAccept(this::parseAndSaveMovie);
     }
 
     private void parseAndSaveMovie(String json) {
-        System.out.println("RAW JSON: " + json);
         try {
-            ObjectMapper mapper = new ObjectMapper();
-            Movie movie = mapper.readValue(json, Movie.class);
-            if (movie.getTitle() == null) {
-                Platform.runLater(() -> statusLabel.setText("Movie not found in API."));
-                return;}
-            saveToDatabase(movie);
-            Platform.runLater(() -> {
-                statusLabel.setText("Saved: " + movie.getTitle());
-                apiSearchField.clear();
-                loadMoviesFromDatabase();
-            });
-        } catch (IOException e) { e.printStackTrace(); }
+            Movie movie = new ObjectMapper().readValue(json, Movie.class);
+            if (movie.getTitle() != null) {
+                saveToDatabase(movie);
+                Platform.runLater(() -> {
+                    statusLabel.setText("Saved: " + movie.getTitle());
+                    loadMoviesFromDatabase();
+                });
+            } else {
+                Platform.runLater(() -> statusLabel.setText("Movie not found."));
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+    }
+
+    @FXML
+    private void handleScheduleShow(ActionEvent event) throws IOException {
+        Movie selected = movieTable.getSelectionModel().getSelectedItem();
+        if (selected == null) {
+            statusLabel.setText("Select a movie first!");
+            return;
+        }
+
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("schedule-movie.fxml"));
+        Parent root = loader.load();
+
+        ScheduleMovieController controller = loader.getController();
+        controller.setMovieTitle(selected.getTitle());
+
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        stage.setScene(new Scene(root, 900, 600));
+    }
+
+    @FXML
+    private void handleViewShows(ActionEvent event) throws IOException {
+
+        sceneSwitcher.switchScene(event, "manage-shows.fxml");
+    }
+
+    @FXML
+    private void handleDeleteMovie() {
+        Movie selected = movieTable.getSelectionModel().getSelectedItem();
+        if (selected == null) return;
+        String sql = "DELETE FROM movies WHERE title = ?";
+        try (Connection conn = DatabaseHandler.connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setString(1, selected.getTitle());
+            pstmt.executeUpdate();
+            loadMoviesFromDatabase();
+            statusLabel.setText("Deleted: " + selected.getTitle());
+        } catch (SQLException e) { e.printStackTrace(); }
+    }
+
+    @FXML
+    private void handleLogout(ActionEvent event) throws IOException {
+        sceneSwitcher.switchScene(event, "Login.fxml");
     }
 
     private void saveToDatabase(Movie movie) {
         String sql = "INSERT OR IGNORE INTO movies(title, genre, duration, posterPath) VALUES(?,?,?,?)";
-        try (Connection conn = DatabaseHandler.connect();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DatabaseHandler.connect(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, movie.getTitle());
             pstmt.setString(2, movie.getGenre());
             pstmt.setString(3, movie.getDuration());
             pstmt.setString(4, movie.getPosterPath());
             pstmt.executeUpdate();
-            System.out.println("Inserted into DB: " + movie.getTitle());
-        } catch (SQLException e) {
-            System.err.println("Database Save Error: "+e.getMessage());
-        }
+        } catch (SQLException e) { e.printStackTrace(); }
     }
 
     private void loadMoviesFromDatabase() {
         ObservableList<Movie> movieList = FXCollections.observableArrayList();
-        String sql = "SELECT*FROM movies";
-
         try (Connection conn = DatabaseHandler.connect();
-             Statement stmt = conn.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+             ResultSet rs = conn.createStatement().executeQuery("SELECT * FROM movies")) {
             while (rs.next()) {
-                movieList.add(new Movie(
-                        rs.getString("title"), rs.getString("genre"),
-                        rs.getString("duration"), rs.getString("posterPath")
-                ));}
+                movieList.add(new Movie(rs.getString("title"), rs.getString("genre"), rs.getString("duration"), rs.getString("posterPath")));
+            }
             movieTable.setItems(movieList);
-        } catch (SQLException e) { System.err.println("Load Table Error: " + e.getMessage());
-        }
-    }
-    @FXML private void handleDeleteMovie() {
-        Movie selected = movieTable.getSelectionModel().getSelectedItem();
-        if (selected == null) return;
-        String sql = "DELETE FROM movies WHERE title = ?";
-        try (Connection conn = DatabaseHandler.connect();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, selected.getTitle());
-            pstmt.executeUpdate(); loadMoviesFromDatabase();
-            statusLabel.setText("Deleted movie: " + selected.getTitle());
         } catch (SQLException e) { e.printStackTrace(); }
     }
 
-    @FXML private void handleLogout(ActionEvent event) throws IOException {
-        sceneSwitcher.switchScene(event, "Login.fxml");
-    }
+
 }

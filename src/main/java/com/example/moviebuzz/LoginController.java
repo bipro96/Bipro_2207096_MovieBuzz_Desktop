@@ -10,7 +10,8 @@ public class LoginController {
     @FXML private TextField usernameField;
     @FXML private PasswordField passwordField;
     @FXML private Label errorMessageLabel, loginHeader;
-    @FXML private Button adminToggleButton, newAccountButton, backToUserButton;
+    @FXML private Hyperlink backButton, createAccountLink;
+    @FXML private Button adminToggleButton;
 
     private boolean isAdminMode = false;
     private final SceneSwitcher sceneSwitcher = new SceneSwitcher();
@@ -19,15 +20,14 @@ public class LoginController {
     public void handleAdminToggle() {
         isAdminMode = !isAdminMode;
         loginHeader.setText(isAdminMode ? "Admin Portal" : "User Login");
-
         adminToggleButton.setVisible(!isAdminMode);
-        newAccountButton.setVisible(!isAdminMode);
-        backToUserButton.setVisible(isAdminMode);
-
+        backButton.setVisible(isAdminMode);
+        createAccountLink.setVisible(!isAdminMode);
         usernameField.clear();
         passwordField.clear();
         errorMessageLabel.setVisible(false);
     }
+
     @FXML
     public void handleLogin(ActionEvent event) {
         String user = usernameField.getText();
@@ -37,6 +37,7 @@ public class LoginController {
             showError("Please fill in all fields.");
             return;
         }
+
         try (Connection conn = DatabaseHandler.connect()) {
             String sql = "SELECT role FROM users WHERE username = ? AND password = ?";
             PreparedStatement pstmt = conn.prepareStatement(sql);
@@ -46,15 +47,24 @@ public class LoginController {
 
             if (rs.next()) {
                 String role = rs.getString("role");
+
                 if (isAdminMode && "admin".equalsIgnoreCase(role)) {
+
+                    UserSession.getInstance().setUsername(user);
                     sceneSwitcher.switchScene(event, "admin-dashboard.fxml");
                 } else if (!isAdminMode && "customer".equalsIgnoreCase(role)) {
+
+                    UserSession.getInstance().setUsername(user);
                     sceneSwitcher.switchScene(event, "customer-view.fxml");
                 } else {
                     showError("Access denied for this portal.");
                 }
-            } else { showError("Invalid credentials."); }
-        } catch (SQLException | IOException e) { showError("Error: " + e.getMessage()); }
+            } else {
+                showError("Invalid credentials.");
+            }
+        } catch (SQLException | IOException e) {
+            showError("Database Error: " + e.getMessage());
+        }
     }
 
     @FXML
