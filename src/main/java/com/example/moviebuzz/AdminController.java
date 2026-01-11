@@ -9,7 +9,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
@@ -77,13 +76,13 @@ public class AdminController {
         ScheduleMovieController controller = loader.getController();
         controller.setMovieTitle(selected.getTitle());
 
+
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        stage.setScene(new Scene(root, 900, 600));
+        stage.getScene().setRoot(root);
     }
 
     @FXML
     private void handleViewShows(ActionEvent event) throws IOException {
-
         sceneSwitcher.switchScene(event, "manage-shows.fxml");
     }
 
@@ -126,6 +125,4 @@ public class AdminController {
             movieTable.setItems(movieList);
         } catch (SQLException e) { e.printStackTrace(); }
     }
-
-
 }

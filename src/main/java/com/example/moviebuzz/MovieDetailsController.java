@@ -107,16 +107,31 @@ public class MovieDetailsController {
         Show selected = showTable.getSelectionModel().getSelectedItem();
         String user = UserSession.getInstance().getUsername();
         int count = ticketSpinner.getValue();
+        int maxCapacity = 50; // Theater hall limit
 
         if (selected == null) {
             statusLabel.setText("Please select a showtime!");
             return;
         }
 
-        double totalCost = selected.getPrice() * count;
-
         try (Connection conn = DatabaseHandler.connect()) {
+
+            String countSql = "SELECT SUM(ticketCount) FROM bookings WHERE showId = ? AND status = 'Confirmed'";
+            PreparedStatement psCount = conn.prepareStatement(countSql);
+            psCount.setInt(1, selected.getShowId());
+            ResultSet rsCount = psCount.executeQuery();
+            int currentSold = rsCount.next() ? rsCount.getInt(1) : 0;
+
+            if (currentSold + count > maxCapacity) {
+                statusLabel.setText("Sold out! Only " + (maxCapacity - currentSold) + " seats left.");
+                statusLabel.setStyle("-fx-text-fill: red;");
+                return;
+            }
+
+            double totalCost = selected.getPrice() * count;
             conn.setAutoCommit(false);
+
+
             PreparedStatement psBal = conn.prepareStatement(
                     "UPDATE users SET balance = balance - ? WHERE username = ? AND balance >= ?");
             psBal.setDouble(1, totalCost);
@@ -124,6 +139,7 @@ public class MovieDetailsController {
             psBal.setDouble(3, totalCost);
 
             if (psBal.executeUpdate() > 0) {
+
                 String sql = "INSERT INTO bookings(username, showId, movieTitle, showDate, showTime, amountPaid, ticketCount, status) VALUES(?,?,?,?,?,?,?,'Confirmed')";
                 try (PreparedStatement psIns = conn.prepareStatement(sql)) {
                     psIns.setString(1, user);
@@ -136,10 +152,13 @@ public class MovieDetailsController {
                     psIns.executeUpdate();
                 }
                 conn.commit();
+                statusLabel.setText("Booking Successful!");
+                statusLabel.setStyle("-fx-text-fill: #00ff00;");
                 displayBalance();
                 loadMovieStatus();
             } else {
                 statusLabel.setText("Insufficient balance!");
+                statusLabel.setStyle("-fx-text-fill: red;");
             }
         } catch (SQLException e) { e.printStackTrace(); }
     }

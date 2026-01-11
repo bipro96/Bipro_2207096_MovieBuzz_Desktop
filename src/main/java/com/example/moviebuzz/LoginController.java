@@ -47,13 +47,10 @@ public class LoginController {
 
             if (rs.next()) {
                 String role = rs.getString("role");
-
                 if (isAdminMode && "admin".equalsIgnoreCase(role)) {
-
                     UserSession.getInstance().setUsername(user);
                     sceneSwitcher.switchScene(event, "admin-dashboard.fxml");
                 } else if (!isAdminMode && "customer".equalsIgnoreCase(role)) {
-
                     UserSession.getInstance().setUsername(user);
                     sceneSwitcher.switchScene(event, "customer-view.fxml");
                 } else {

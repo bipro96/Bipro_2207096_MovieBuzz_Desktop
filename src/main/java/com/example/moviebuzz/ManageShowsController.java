@@ -48,26 +48,22 @@ public class ManageShowsController {
     private void handleViewBookings(ActionEvent event) {
         Show selected = showsTable.getSelectionModel().getSelectedItem();
         if (selected == null) {
-            showAlert("Selection Required", "Please select a show from the table first.");
+            showAlert("Selection Required", "Please select a show.");
             return;
         }
 
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("show-bookings-details.fxml"));
             Parent root = loader.load();
-
-
             ShowBookingsDetailsController controller = loader.getController();
             controller.loadBookingData(selected);
 
             Stage stage = new Stage();
             stage.setTitle("Customer List - " + selected.getMovieTitle());
             stage.setScene(new Scene(root));
-            stage.initModality(Modality.APPLICATION_MODAL); // Blocks interaction with main window
+            stage.initModality(Modality.APPLICATION_MODAL);
             stage.show();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        } catch (IOException e) { e.printStackTrace(); }
     }
 
     @FXML
@@ -77,48 +73,37 @@ public class ManageShowsController {
 
         try (Connection conn = DatabaseHandler.connect()) {
             conn.setAutoCommit(false);
-
             String cancelShow = "UPDATE shows SET status = 'Cancelled' WHERE showId = ?";
             try (PreparedStatement ps = conn.prepareStatement(cancelShow)) {
                 ps.setInt(1, selected.getShowId());
                 ps.executeUpdate();
             }
-
             String fetchRefunds = "SELECT username, amountPaid FROM bookings WHERE showId = ? AND status = 'Confirmed'";
             try (PreparedStatement psFetch = conn.prepareStatement(fetchRefunds)) {
                 psFetch.setInt(1, selected.getShowId());
                 ResultSet rs = psFetch.executeQuery();
-
                 while (rs.next()) {
-                    String userToRefund = rs.getString("username");
-                    double amountToRefund = rs.getDouble("amountPaid");
-
                     String updateBalance = "UPDATE users SET balance = balance + ? WHERE username = ?";
                     try (PreparedStatement psBal = conn.prepareStatement(updateBalance)) {
-                        psBal.setDouble(1, amountToRefund);
-                        psBal.setString(2, userToRefund);
+                        psBal.setDouble(1, rs.getDouble("amountPaid"));
+                        psBal.setString(2, rs.getString("username"));
                         psBal.executeUpdate();
                     }
                 }
             }
-
             String updateBookings = "UPDATE bookings SET status = 'Refunded' WHERE showId = ? AND status = 'Confirmed'";
             try (PreparedStatement psBook = conn.prepareStatement(updateBookings)) {
                 psBook.setInt(1, selected.getShowId());
                 psBook.executeUpdate();
             }
-
             conn.commit();
             loadShows();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        } catch (SQLException e) { e.printStackTrace(); }
     }
 
     private void showAlert(String title, String content) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setTitle(title);
-        alert.setHeaderText(null);
         alert.setContentText(content);
         alert.showAndWait();
     }

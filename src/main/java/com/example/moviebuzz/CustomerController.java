@@ -5,7 +5,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextInputDialog;
@@ -19,7 +18,6 @@ import java.sql.*;
 
 public class CustomerController {
     @FXML private FlowPane movieFlowPane;
-
     private final SceneSwitcher sceneSwitcher = new SceneSwitcher();
 
     @FXML
@@ -27,51 +25,9 @@ public class CustomerController {
         loadMovies();
     }
 
-    @FXML
-    private void handleRecharge() {
-        String username = UserSession.getInstance().getUsername();
-
-        if (username == null || username.isEmpty()) {
-            showAlert(Alert.AlertType.ERROR, "Session Error", "No user logged in. Please login again.");
-            return;
-        }
-
-        TextInputDialog dialog = new TextInputDialog("500");
-        dialog.setTitle("Account Recharge");
-        dialog.setHeaderText("Add Virtual Funds for " + username);
-        dialog.setContentText("Enter amount (BDT):");
-
-        dialog.showAndWait().ifPresent(amountStr -> {
-            try {
-                double amount = Double.parseDouble(amountStr);
-                if (amount <= 0) throw new NumberFormatException();
-
-                if (updateUserBalance(username, amount)) {
-                    showAlert(Alert.AlertType.INFORMATION, "Success", "Added BDT " + amount + " to your account!");
-                } else {
-                    showAlert(Alert.AlertType.ERROR, "Database Error", "User not found.");
-                }
-            } catch (NumberFormatException e) {
-                showAlert(Alert.AlertType.ERROR, "Invalid Input", "Please enter a valid positive number.");
-            }
-        });
-    }
-
-    private boolean updateUserBalance(String username, double amount) {
-        String sql = "UPDATE users SET balance = IFNULL(balance, 0) + ? WHERE username = ?";
-        try (Connection conn = DatabaseHandler.connect();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setDouble(1, amount);
-            pstmt.setString(2, username);
-            return pstmt.executeUpdate() > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-
     private void loadMovies() {
         movieFlowPane.getChildren().clear();
+
         String sql = "SELECT DISTINCT m.* FROM movies m " +
                 "JOIN shows s ON m.title = s.movieTitle " +
                 "WHERE s.status = 'Active'";
@@ -111,7 +67,6 @@ public class CustomerController {
 
         movieCard.getChildren().addAll(imageView, titleLabel);
 
-
         movieCard.setOnMouseClicked(event -> {
             try {
                 showMovieDetails(event, movie);
@@ -119,7 +74,6 @@ public class CustomerController {
                 e.printStackTrace();
             }
         });
-
         return movieCard;
     }
 
@@ -130,15 +84,44 @@ public class CustomerController {
         MovieDetailsController controller = loader.getController();
         controller.setMovieDetails(movie);
 
+
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        stage.setScene(new Scene(root, 900, 600));
-        stage.show();
+        stage.getScene().setRoot(root);
+    }
+
+    @FXML
+    private void handleRecharge() {
+        String username = UserSession.getInstance().getUsername();
+        TextInputDialog dialog = new TextInputDialog("500");
+        dialog.setTitle("Account Recharge");
+        dialog.setHeaderText("Add Funds for " + username);
+        dialog.setContentText("Enter amount (BDT):");
+
+        dialog.showAndWait().ifPresent(amountStr -> {
+            try {
+                double amount = Double.parseDouble(amountStr);
+                if (amount > 0 && updateUserBalance(username, amount)) {
+                    showAlert(Alert.AlertType.INFORMATION, "Success", "Added BDT " + amount);
+                }
+            } catch (NumberFormatException e) {
+                showAlert(Alert.AlertType.ERROR, "Error", "Invalid amount.");
+            }
+        });
+    }
+
+    private boolean updateUserBalance(String username, double amount) {
+        String sql = "UPDATE users SET balance = IFNULL(balance, 0) + ? WHERE username = ?";
+        try (Connection conn = DatabaseHandler.connect();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setDouble(1, amount);
+            pstmt.setString(2, username);
+            return pstmt.executeUpdate() > 0;
+        } catch (SQLException e) { return false; }
     }
 
     private void showAlert(Alert.AlertType type, String title, String content) {
         Alert alert = new Alert(type);
         alert.setTitle(title);
-        alert.setHeaderText(null);
         alert.setContentText(content);
         alert.showAndWait();
     }
